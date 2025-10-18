@@ -1,0 +1,29 @@
+{
+  "seed": 42,
+  "parameters": {
+    "emergence_rate": 0.1,
+    "force_constants": {
+      "epsilon": 1.0,
+      "sigma": 1.0,
+      "cutoff": 3.0
+    },
+    "decay_constants": {
+      "alpha": 0.1,
+      "beta": 0.01,
+      "min_bond_energy": 0.01
+    },
+    "time_limit": 10000,
+    "stability_threshold": 0.95
+  },
+  "final_state": {
+    "iteration": 1000,
+    "total_energy": 29390.22575824714,
+    "total_mass": 52.0,
+    "particle_count": 52,
+    "atom_count": 52,
+    "bond_count": 42,
+    "entropy": 3.036074955012941e-22
+  },
+  "stable_structures": [],
+  "timestamp": 1760813094.7440178
+}

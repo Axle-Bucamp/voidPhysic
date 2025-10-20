@@ -400,12 +400,107 @@ This physics model can be applied to:
 - **Thermodynamics**: Exploring entropy and energy flow in evolving systems
 - **Quantum Mechanics**: Investigating quantum effects in macroscopic systems
 
+## Quantum Mechanics Foundation
+
+The void physics framework extends into quantum mechanics, providing a bridge between classical emergence and quantum field theory. This section outlines the quantum equations and their connection to void physics.
+
+### Core Quantum Equations
+
+| Theory | Equation | Energy Concept | Domain |
+|--------|----------|----------------|---------|
+| **Schrödinger** | iℏ ∂Ψ/∂t = ĤΨ | Expectation value of Hamiltonian | Nonrelativistic |
+| **Heisenberg** | dÂ/dt = (i/ℏ)[Ĥ,Â] | Generator of evolution | Operator form |
+| **Klein-Gordon** | (□ + (mc/ℏ)²)Ψ = 0 | Relativistic energy-momentum | Spin-0 |
+| **Dirac** | (iℏ γ^μ ∂_μ - mc)Ψ = 0 | Relativistic + spin | Spin-½ |
+| **QFT** | iℏ ∂_t φ̂ = [φ̂,Ĥ] | Quantized energy fields | All particles |
+| **Wheeler-DeWitt** | ĤΨ = 0 | Universe total energy zero | Quantum gravity |
+
+### Schrödinger Equation Implementation
+
+The time-dependent Schrödinger equation is solved using the split-operator FFT method:
+
+```python
+# Split-operator method: exp(-iĤdt/ℏ) ≈ exp(-iVdt/(2ℏ)) exp(-iTdt/ℏ) exp(-iVdt/(2ℏ))
+
+# Step 1: Half step in position space (potential)
+psi *= np.exp(-1j * V_values * dt / (2 * hbar))
+
+# Step 2: Full step in momentum space (kinetic)
+psi_k = fft(psi)
+kinetic_phase = np.exp(-1j * hbar * k_grid**2 * dt / (2 * mass))
+psi_k *= kinetic_phase
+psi = ifft(psi_k)
+
+# Step 3: Half step in position space (potential)
+psi *= np.exp(-1j * V_values * dt / (2 * hbar))
+```
+
+### Probability Current
+
+The probability current vector field describes how probability "flows" through space:
+
+**j = (ℏ/2mi)(Ψ*∇Ψ - Ψ∇Ψ*)**
+
+This connects to void physics by showing how quantum probability can drive particle emergence when |Ψ|² exceeds critical thresholds.
+
+### Quantum Potential
+
+The quantum potential represents the "quantum force" that emerges from wave function structure:
+
+**V_quantum = -(ℏ²/2m)(∇²√ρ)/√ρ**
+
+where ρ = |Ψ|² is the probability density. This quantum potential can trigger void instability and particle emergence.
+
+### Void-Quantum Connection
+
+The connection between void physics and quantum mechanics occurs through:
+
+1. **Vacuum Fluctuations**: Quantum noise η(t) with ⟨η(t)η(t')⟩ = (ℏ/2)δ(t-t') drives void instability
+2. **Field Excitations**: Particles emerge as quantized field excitations when |Ψ|² > threshold
+3. **Tunneling**: Quantum tunneling through potential barriers enables void → spacetime transitions
+4. **Uncertainty Principle**: Δx Δp ≥ ℏ/2 creates natural emergence probabilities
+
+### Quantum Field Theory Integration
+
+In the quantum field theory framework:
+
+- **Field Operators**: â†, â for particle creation/annihilation
+- **Field Evolution**: ∂²φ/∂t² = ∇²φ - m²φ - λφ³
+- **Particle Emergence**: When field amplitude exceeds threshold, spawn particle in void_physics_life_game.py
+- **Energy Conservation**: Total energy includes field energy + particle kinetic energy
+
+### Mathematical Derivation: Probability Current
+
+Starting from the Schrödinger equation:
+
+iℏ ∂Ψ/∂t = -ℏ²/(2m) ∇²Ψ + VΨ
+
+Taking the complex conjugate:
+
+-iℏ ∂Ψ*/∂t = -ℏ²/(2m) ∇²Ψ* + VΨ*
+
+Multiplying first equation by Ψ* and second by Ψ, then subtracting:
+
+iℏ(Ψ* ∂Ψ/∂t + Ψ ∂Ψ*/∂t) = -ℏ²/(2m)(Ψ* ∇²Ψ - Ψ ∇²Ψ*)
+
+The left side is: iℏ ∂/∂t(Ψ*Ψ) = iℏ ∂ρ/∂t
+
+The right side can be written as: -ℏ²/(2m) ∇·(Ψ*∇Ψ - Ψ∇Ψ*)
+
+Therefore: ∂ρ/∂t + ∇·j = 0
+
+where **j = (ℏ/2mi)(Ψ*∇Ψ - Ψ∇Ψ*)** is the probability current.
+
+This continuity equation shows that probability is conserved, and the current j describes how probability "flows" through space - a key mechanism for void particle emergence.
+
 ## References
 
 1. Lennard-Jones, J. E. (1924). "On the Determination of Molecular Fields". Proceedings of the Royal Society of London.
 2. Boltzmann, L. (1877). "Über die Beziehung zwischen dem zweiten Hauptsatze der mechanischen Wärmetheorie und der Wahrscheinlichkeitsrechnung". Wiener Berichte.
 3. Shannon, C. E. (1948). "A Mathematical Theory of Communication". Bell System Technical Journal.
+4. Schrödinger, E. (1926). "Quantisierung als Eigenwertproblem". Annalen der Physik.
+5. Dirac, P. A. M. (1928). "The Quantum Theory of the Electron". Proceedings of the Royal Society of London.
 
 ---
 
-This physics model provides a foundation for exploring the emergence of complexity from simple rules, offering insights into how our universe might have evolved from a primordial void.
+This physics model provides a foundation for exploring the emergence of complexity from simple rules, offering insights into how our universe might have evolved from a primordial void through quantum mechanical processes.

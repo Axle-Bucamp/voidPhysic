@@ -41,6 +41,9 @@ class VoidEmergenceScene(Scene):
         # Act 2: Instability
         self.act_2_instability()
 
+        # Act 2.5: Quantum Fluctuations
+        self.act_2_5_quantum_fluctuations()
+
         # Act 3: Emergence
         self.act_3_emergence()
 
@@ -191,6 +194,149 @@ class VoidEmergenceScene(Scene):
             FadeOut(fluctuation_text),
             FadeOut(noise_curve),
             FadeOut(growth_curve),
+            run_time=1,
+        )
+
+    def act_2_5_quantum_fluctuations(self):
+        """Act 2.5: Quantum Fluctuations - Ψ triggers void instability."""
+        # Title
+        quantum_title = Text("Quantum Fluctuations", font_size=24, color=CYAN)
+        quantum_title.to_edge(UP)
+        self.play(Write(quantum_title))
+        
+        # Set up quantum axes
+        quantum_axes = Axes(
+            x_range=[-3, 3, 1],
+            y_range=[-1, 1, 0.5],
+            x_length=8,
+            y_length=4,
+            axis_config={"color": CYAN},
+            tips=False,
+        )
+        
+        # Create wave function visualization
+        def wave_function(x):
+            return 0.5 * np.exp(-x**2 / 2) * np.sin(3 * x)
+        
+        psi_curve = quantum_axes.plot(
+            wave_function,
+            x_range=[-3, 3],
+            color=YELLOW,
+            stroke_width=3,
+        )
+        
+        # Show wave function
+        self.play(Create(quantum_axes))
+        self.play(Create(psi_curve))
+        
+        # Add wave function label
+        psi_label = MathTex(r"\Psi(x,t)", font_size=20, color=YELLOW)
+        psi_label.next_to(psi_curve, UP)
+        self.play(Write(psi_label))
+        
+        # Show probability density
+        def probability_density(x):
+            return wave_function(x)**2
+        
+        prob_curve = quantum_axes.plot(
+            probability_density,
+            x_range=[-3, 3],
+            color=GREEN,
+            stroke_width=2,
+        )
+        
+        prob_label = MathTex(r"|\Psi|^2", font_size=20, color=GREEN)
+        prob_label.next_to(prob_curve, DOWN)
+        
+        self.play(Create(prob_curve))
+        self.play(Write(prob_label))
+        
+        # Show quantum uncertainty
+        uncertainty_text = Text(
+            "Quantum uncertainty: Δx Δp ≥ ℏ/2", 
+            font_size=18, 
+            color=ORANGE
+        )
+        uncertainty_text.to_edge(DOWN)
+        self.play(Write(uncertainty_text))
+        
+        # Animate wave function evolution
+        for i in range(20):
+            # Simple wave packet spreading
+            def evolved_wave(x, t=i*0.1):
+                return 0.5 * np.exp(-x**2 / (2 + t)) * np.sin(3 * x + t)
+            
+            new_psi_curve = quantum_axes.plot(
+                lambda x: evolved_wave(x),
+                x_range=[-3, 3],
+                color=YELLOW,
+                stroke_width=3,
+            )
+            
+            new_prob_curve = quantum_axes.plot(
+                lambda x: evolved_wave(x)**2,
+                x_range=[-3, 3],
+                color=GREEN,
+                stroke_width=2,
+            )
+            
+            self.play(
+                Transform(psi_curve, new_psi_curve),
+                Transform(prob_curve, new_prob_curve),
+                run_time=0.1
+            )
+        
+        # Show connection to void instability
+        connection_text = Text(
+            "When |Ψ|² > threshold → particle emergence", 
+            font_size=18, 
+            color=RED
+        )
+        connection_text.to_edge(DOWN)
+        
+        self.play(Transform(uncertainty_text, connection_text))
+        
+        # Show threshold line
+        threshold_line = quantum_axes.plot(
+            lambda x: 0.3,  # Threshold value
+            x_range=[-3, 3],
+            color=RED,
+            stroke_width=2,
+            stroke_dasharray=[5, 5]
+        )
+        
+        self.play(Create(threshold_line))
+        
+        # Highlight regions above threshold
+        above_threshold = quantum_axes.plot(
+            lambda x: max(0, probability_density(x) - 0.3),
+            x_range=[-3, 3],
+            color=RED,
+            stroke_width=4,
+        )
+        
+        self.play(Create(above_threshold))
+        
+        # Add equation
+        equation = MathTex(
+            r"i\hbar \frac{\partial \Psi}{\partial t} = \hat{H}\Psi",
+            font_size=16,
+            color=WHITE
+        )
+        equation.to_corner(UR)
+        self.play(Write(equation))
+        
+        self.wait(2)
+        
+        # Transition to next act
+        self.play(
+            FadeOut(quantum_title),
+            FadeOut(psi_label),
+            FadeOut(prob_label),
+            FadeOut(uncertainty_text),
+            FadeOut(threshold_line),
+            FadeOut(above_threshold),
+            FadeOut(equation),
             run_time=1,
         )
 

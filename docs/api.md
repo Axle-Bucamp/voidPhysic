@@ -2,7 +2,249 @@
 
 ## Overview
 
-This document provides a comprehensive API reference for the Void Physics Life Simulation. The API is organized into core classes that handle different aspects of the simulation.
+This document provides a comprehensive API reference for the Void Physics Life Simulation and Quantum Mechanics Integration. The API is organized into core classes that handle different aspects of the simulation, including the new quantum mechanics modules.
+
+## Quantum Mechanics Module
+
+### SchrodingerSolver
+
+Solves the time-dependent Schrödinger equation using the split-operator FFT method.
+
+```python
+class SchrodingerSolver:
+    def __init__(self, params: SchrodingerParameters):
+        """Initialize Schrödinger equation solver.
+        
+        Args:
+            params: SchrödingerParameters object containing solver configuration
+        """
+```
+
+#### Methods
+
+```python
+def evolve_step(self, psi: WaveFunction) -> WaveFunction:
+    """Evolve wave function by one time step.
+    
+    Args:
+        psi: Current wave function
+        
+    Returns:
+        Evolved wave function
+    """
+
+def evolve_trajectory(self, psi_init: WaveFunction, n_steps: int) -> Tuple[np.ndarray, np.ndarray]:
+    """Evolve wave function over multiple time steps.
+    
+    Args:
+        psi_init: Initial wave function
+        n_steps: Number of time steps
+        
+    Returns:
+        Tuple of (wave_function_trajectory, time_array)
+    """
+
+def create_gaussian_packet(self, x0: float, p0: float, sigma: float) -> WaveFunction:
+    """Create initial Gaussian wave packet.
+    
+    Args:
+        x0: Initial position
+        p0: Initial momentum
+        sigma: Width parameter
+        
+    Returns:
+        Gaussian wave packet
+    """
+```
+
+### WaveFunction
+
+Represents a quantum wave function with probability density and current calculations.
+
+```python
+class WaveFunction:
+    def __init__(self, psi: np.ndarray, x_grid: np.ndarray, mass: float = 1.0, hbar: float = 1.0):
+        """Initialize wave function.
+        
+        Args:
+            psi: Complex wave function values
+            x_grid: Spatial grid
+            mass: Particle mass
+            hbar: Reduced Planck constant
+        """
+```
+
+#### Methods
+
+```python
+def probability_density(self) -> np.ndarray:
+    """Calculate probability density |ψ|²."""
+
+def probability_current(self) -> np.ndarray:
+    """Calculate probability current j = (ℏ/2mi)(ψ*∇ψ - ψ∇ψ*)."""
+
+def normalize(self) -> None:
+    """Normalize wave function to unit probability."""
+```
+
+### KleinGordonSolver
+
+Solves the Klein-Gordon equation for relativistic spin-0 particles.
+
+```python
+class KleinGordonSolver:
+    def __init__(self, params: RelativisticParameters):
+        """Initialize Klein-Gordon equation solver.
+        
+        Args:
+            params: RelativisticParameters object
+        """
+```
+
+#### Methods
+
+```python
+def evolve_step(self, phi: np.ndarray, dphi_dt: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Evolve field by one time step.
+    
+    Args:
+        phi: Current field values
+        dphi_dt: Current field time derivative
+        
+    Returns:
+        Tuple of (new_phi, new_dphi_dt)
+    """
+```
+
+### DiracSolver
+
+Solves the Dirac equation for relativistic spin-½ particles.
+
+```python
+class DiracSolver:
+    def __init__(self, params: RelativisticParameters):
+        """Initialize Dirac equation solver.
+        
+        Args:
+            params: RelativisticParameters object
+        """
+```
+
+#### Methods
+
+```python
+def evolve_step(self, psi_spinor: np.ndarray) -> np.ndarray:
+    """Evolve Dirac spinor by one time step.
+    
+    Args:
+        psi_spinor: 2-component spinor wave function
+        
+    Returns:
+        Evolved spinor
+    """
+```
+
+### QuantumField
+
+Represents a quantum scalar field with creation and annihilation operators.
+
+```python
+class QuantumField:
+    def __init__(self, params: FieldParameters):
+        """Initialize quantum field.
+        
+        Args:
+            params: FieldParameters object
+        """
+```
+
+#### Methods
+
+```python
+def evolve_step(self) -> None:
+    """Evolve field by one time step."""
+
+def calculate_observables(self) -> Dict[str, float]:
+    """Calculate field observables (energy, variance, etc.)."""
+
+def get_particle_positions(self, threshold: float = 0.1) -> List[float]:
+    """Get positions where field amplitude exceeds threshold."""
+```
+
+### ParticleCreation
+
+Handles particle creation and annihilation events in quantum field.
+
+```python
+class ParticleCreation:
+    def __init__(self, quantum_field: QuantumField):
+        """Initialize particle creation handler.
+        
+        Args:
+            quantum_field: Associated quantum field
+        """
+```
+
+#### Methods
+
+```python
+def particle_creation_event(self, k: float, amplitude: float) -> None:
+    """Create particle with given momentum and amplitude.
+    
+    Args:
+        k: Momentum
+        amplitude: Creation amplitude
+    """
+
+def particle_annihilation_event(self, position: float, amplitude: float) -> None:
+    """Annihilate particle at given position.
+    
+    Args:
+        position: Annihilation position
+        amplitude: Annihilation amplitude
+    """
+```
+
+## Quantum Dashboard API
+
+### QuantumDashboard
+
+Interactive Plotly Dash application for quantum void physics exploration.
+
+```python
+class QuantumDashboard:
+    def __init__(self):
+        """Initialize quantum dashboard."""
+```
+
+#### Methods
+
+```python
+def run(self, debug: bool = True, port: int = 8050) -> None:
+    """Run the dashboard server.
+    
+    Args:
+        debug: Enable debug mode
+        port: Server port
+    """
+
+def create_sandbox_layout(self) -> html.Div:
+    """Create sandbox mode layout with parameter controls."""
+
+def create_game_layout(self) -> html.Div:
+    """Create game mode layout with universe simulation."""
+
+def create_theory_layout(self) -> html.Div:
+    """Create theory mode layout with equation explanations."""
+```
+
+#### Callbacks
+
+The dashboard includes several Plotly Dash callbacks for real-time interaction:
+
+- `update_sandbox_plots`: Updates quantum simulation plots based on parameter changes
+- `update_game_plots`: Handles universe simulation in game mode
+- `render_tab_content`: Switches between different dashboard modes
 
 ## Core Classes
 

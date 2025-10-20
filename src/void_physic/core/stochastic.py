@@ -66,19 +66,25 @@ class WhiteNoise(NoiseModel):
     White noise: η(t) with ⟨η(t)η(t')⟩ = 2D δ(t-t')
 
     This represents uncorrelated quantum fluctuations that can trigger
-    symmetry breaking in the void state.
+    symmetry breaking in the void state. In quantum mechanics, this
+    corresponds to vacuum fluctuations that drive particle emergence.
     """
 
-    def __init__(self, strength: float = 1.0, seed: Optional[int] = None):
+    def __init__(self, strength: float = 1.0, seed: Optional[int] = None, 
+                 quantum_mode: bool = False, hbar: float = 1.0):
         """
         Initialize white noise generator.
 
         Args:
             strength: Noise strength (diffusion coefficient D)
             seed: Random seed for reproducibility
+            quantum_mode: If True, use quantum vacuum fluctuation model
+            hbar: Reduced Planck constant for quantum mode
         """
         self.strength = strength
         self.rng = np.random.RandomState(seed)
+        self.quantum_mode = quantum_mode
+        self.hbar = hbar
 
     def generate(self, t: np.ndarray, dt: float) -> np.ndarray:
         """
@@ -97,8 +103,14 @@ class WhiteNoise(NoiseModel):
         else:
             n_points = len(t)
 
-        # White noise: Gaussian with variance 2D/dt
-        variance = 2 * self.strength / dt
+        if self.quantum_mode:
+            # Quantum vacuum fluctuations: η(t) with ⟨η(t)η(t')⟩ = (ℏ/2)δ(t-t')
+            # This represents quantum uncertainty in the void state
+            variance = self.hbar / (2 * dt)
+        else:
+            # Classical white noise: Gaussian with variance 2D/dt
+            variance = 2 * self.strength / dt
+            
         return self.rng.normal(0, np.sqrt(variance), n_points)
 
     def power_spectrum(self, frequencies: np.ndarray) -> np.ndarray:
@@ -109,9 +121,14 @@ class WhiteNoise(NoiseModel):
             frequencies: Frequency array
 
         Returns:
-            Constant power spectrum
+            Power spectrum values
         """
-        return np.full_like(frequencies, 2 * self.strength)
+        if self.quantum_mode:
+            # Quantum vacuum has zero-point energy: E = ℏω/2
+            return np.full_like(frequencies, self.hbar / 2)
+        else:
+            # Classical white noise has flat power spectrum
+            return np.full_like(frequencies, 2 * self.strength)
 
     def correlation_function(self, tau: np.ndarray) -> np.ndarray:
         """
@@ -128,8 +145,59 @@ class WhiteNoise(NoiseModel):
         # Use a reasonable threshold for numerical stability
         # For typical tau arrays, use threshold of 0.02
         threshold = 0.02
-        correlation[np.abs(tau) < threshold] = 2 * self.strength
+        
+        if self.quantum_mode:
+            correlation[np.abs(tau) < threshold] = self.hbar / 2
+        else:
+            correlation[np.abs(tau) < threshold] = 2 * self.strength
+            
         return correlation
+    
+    def quantum_vacuum_fluctuation(self, psi: np.ndarray, x_grid: np.ndarray,
+                                 mass: float = 1.0) -> np.ndarray:
+        """
+        Generate quantum vacuum fluctuation based on wave function.
+        
+        This connects quantum mechanics to void physics by using the
+        wave function to determine fluctuation strength.
+        
+        Args:
+            psi: Wave function
+            x_grid: Spatial grid
+            mass: Particle mass
+            
+        Returns:
+            Quantum vacuum fluctuation field
+        """
+        if not self.quantum_mode:
+            raise ValueError("Quantum mode must be enabled for vacuum fluctuations")
+        
+        # Quantum uncertainty: Δx Δp ≥ ℏ/2
+        # Fluctuation strength depends on local wave function amplitude
+        psi_amplitude = np.abs(psi)
+        
+        # Vacuum fluctuation: stronger where |ψ|² is larger
+        fluctuation_strength = self.hbar * psi_amplitude / (2 * mass)
+        
+        # Generate spatially correlated noise
+        dx = x_grid[1] - x_grid[0]
+        n_points = len(x_grid)
+        
+        # White noise in momentum space, colored in position space
+        noise_k = self.rng.normal(0, 1, n_points) + 1j * self.rng.normal(0, 1, n_points)
+        
+        # Apply quantum uncertainty filter
+        k_grid = 2 * np.pi * np.fft.fftfreq(n_points, dx)
+        uncertainty_filter = np.exp(-k_grid**2 * self.hbar / (4 * mass))
+        noise_k *= uncertainty_filter
+        
+        # Convert to position space
+        noise_x = np.fft.ifft(noise_k).real
+        
+        # Scale by local fluctuation strength
+        vacuum_fluctuation = fluctuation_strength * noise_x
+        
+        return vacuum_fluctuation
 
 
 class ColoredNoise(NoiseModel):

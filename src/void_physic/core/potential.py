@@ -107,6 +107,114 @@ class DoubleWellPotential:
             "positive_vacuum": self.params.v_vev,
             "negative_vacuum": -self.params.v_vev,
         }
+    
+    def quantum_potential(self, psi: np.ndarray, x_grid: np.ndarray, 
+                         mass: float = 1.0, hbar: float = 1.0) -> np.ndarray:
+        """
+        Add quantum potential: V_quantum = -(ℏ²/2m)(∇²√ρ)/√ρ
+        
+        This represents the "quantum force" that emerges from the wave function
+        and can be related to void physics emergence mechanisms.
+        
+        Args:
+            psi: Wave function
+            x_grid: Spatial grid
+            mass: Particle mass
+            hbar: Reduced Planck constant
+            
+        Returns:
+            Quantum potential values
+        """
+        # Probability density
+        rho = np.abs(psi)**2
+        
+        # Avoid division by zero
+        rho_safe = np.maximum(rho, 1e-10)
+        sqrt_rho = np.sqrt(rho_safe)
+        
+        # Calculate second derivative of √ρ
+        dx = x_grid[1] - x_grid[0]
+        d2_sqrt_rho_dx2 = np.gradient(np.gradient(sqrt_rho, dx), dx)
+        
+        # Quantum potential
+        V_quantum = -(hbar**2 / (2 * mass)) * d2_sqrt_rho_dx2 / sqrt_rho
+        
+        return V_quantum.real  # Should be real
+    
+    def tunneling_probability(self, psi: np.ndarray, x_grid: np.ndarray,
+                             barrier_region: Tuple[float, float]) -> float:
+        """
+        Calculate quantum tunneling probability through potential barrier.
+        
+        Args:
+            psi: Wave function
+            x_grid: Spatial grid
+            barrier_region: (x_min, x_max) defining barrier region
+            
+        Returns:
+            Tunneling probability
+        """
+        x_min, x_max = barrier_region
+        
+        # Find indices corresponding to barrier region
+        barrier_mask = (x_grid >= x_min) & (x_grid <= x_max)
+        
+        # Calculate probability inside barrier
+        dx = x_grid[1] - x_grid[0]
+        barrier_probability = np.sum(np.abs(psi)**2[barrier_mask]) * dx
+        
+        return barrier_probability
+    
+    def quantum_barrier_penetration(self, psi: np.ndarray, x_grid: np.ndarray,
+                                   mass: float = 1.0, hbar: float = 1.0) -> Dict[str, float]:
+        """
+        Calculate quantum barrier penetration properties.
+        
+        Args:
+            psi: Wave function
+            x_grid: Spatial grid
+            mass: Particle mass
+            hbar: Reduced Planck constant
+            
+        Returns:
+            Dictionary with penetration properties
+        """
+        # Find potential barrier (where V > 0 and dV/dx changes sign)
+        phi_values = np.linspace(-2*self.params.v_vev, 2*self.params.v_vev, 1000)
+        V_values = self(phi_values)
+        
+        # Find barrier height
+        barrier_height = np.max(V_values)
+        
+        # Calculate quantum potential
+        V_quantum = self.quantum_potential(psi, x_grid, mass, hbar)
+        
+        # Effective potential (classical + quantum)
+        V_effective = V_values + V_quantum
+        
+        # Tunneling coefficient (WKB approximation)
+        # T ≈ exp(-2∫√(2m(V-E)/ℏ²)dx)
+        E_kinetic = hbar**2 / (2 * mass) * np.max(np.abs(np.gradient(psi, x_grid))**2)
+        
+        if barrier_height > E_kinetic:
+            # Classical turning points
+            turning_points = np.where(V_values > E_kinetic)[0]
+            if len(turning_points) > 0:
+                # Simple tunneling estimate
+                barrier_width = len(turning_points) * (phi_values[1] - phi_values[0])
+                tunneling_coefficient = np.exp(-2 * np.sqrt(2 * mass * (barrier_height - E_kinetic)) * barrier_width / hbar)
+            else:
+                tunneling_coefficient = 1.0
+        else:
+            tunneling_coefficient = 1.0
+        
+        return {
+            'barrier_height': barrier_height,
+            'quantum_potential_max': np.max(V_quantum),
+            'effective_potential_max': np.max(V_effective),
+            'tunneling_coefficient': tunneling_coefficient,
+            'kinetic_energy': E_kinetic
+        }
 
     def stability_analysis(self) -> Dict[str, Dict[str, Any]]:
         """

@@ -10,9 +10,15 @@ Void physics explores how spacetime, matter, and time emerge from a primordial "
 
 ### Core Simulations
 
-- **`universe_creation_simulation.py`** - 2D universe creation with wave collapse and atom emergence
-- **`void_physics_life_game.py`** - Cellular automaton implementing void physics rules
+- **`void_physics_life_game.py`** - Main universe simulation with quantum mechanics integration
 - **`void_physics_master_dashboard.py`** - Comprehensive dashboard combining all simulations
+
+### Quantum Mechanics Examples
+
+- **`quantum_examples/schrodinger_tunneling.py`** - Quantum tunneling through potential barriers
+- **`quantum_examples/wave_packet_evolution.py`** - Wave packet spreading and evolution
+- **`quantum_examples/quantum_void_emergence.py`** - Particles emerging from quantum vacuum
+- **`quantum_examples/universe_game_tutorial.py`** - Tutorial for quantum universe game
 
 ### Educational Content
 
@@ -20,39 +26,57 @@ Void physics explores how spacetime, matter, and time emerge from a primordial "
 - **`beautiful_3d_plots.py`** - Stunning 3D visualizations of void physics concepts
 - **`interactive_data_exploration.py`** - Comprehensive data analysis and hypothesis testing
 
-### Demonstrations
+### Demonstrations (Legacy)
 
 - **`demo_universe_creation.py`** - Simple demonstration of universe creation
 - **`toy_model_0d.py`** - 0D Langevin simulation with FPT analysis
 - **`void_emergence.py`** - Basic void emergence visualization
-
-### Testing
-
-- **`simple_void_physics_test.py`** - Core component tests
-- **`test_void_physics_simulations.py`** - Comprehensive test suite
+- **`universe_creation_simulation.py`** - 2D universe creation (superseded by life game)
+- **`demo_advanced_void_physics.py`** - Advanced demo (superseded by quantum dashboard)
+- **`advanced_void_physics_simulation.py`** - Advanced simulation (superseded by quantum integration)
+- **`cmb_signatures.py`** - CMB analysis (specialized, kept for research)
+- **`simple_void_physics_test.py`** - Core component tests (moved to tests/)
 
 ## 🚀 Quick Start
 
-### 1. Run Tests
+### 1. Quantum Dashboard (Recommended)
 ```bash
-uv run python examples/simple_void_physics_test.py
+# Run the quantum mechanics dashboard
+uv run python -m void_physic.visualization.quantum_dashboard
+```
+Then open http://localhost:8050 in your browser.
+
+### 2. Quantum Examples
+```bash
+# Navigate to quantum examples
+cd examples/quantum_examples
+
+# Run quantum tunneling demo
+uv run python schrodinger_tunneling.py
+
+# Run wave packet evolution
+uv run python wave_packet_evolution.py
+
+# Run quantum void emergence
+uv run python quantum_void_emergence.py
 ```
 
-### 2. Demo Universe Creation
+### 3. Main Universe Simulation
 ```bash
-uv run python examples/demo_universe_creation.py
+# Run the main universe simulation with quantum integration
+uv run python examples/void_physics_life_game.py
 ```
-
-### 3. Interactive Dashboard
-```bash
-uv run python examples/void_physics_master_dashboard.py
-```
-Then open http://localhost:8052 in your browser.
 
 ### 4. Educational Course
 ```bash
 uv run python examples/void_physics_course.py
 ```
+
+### 5. Master Dashboard
+```bash
+uv run python examples/void_physics_master_dashboard.py
+```
+Then open http://localhost:8052 in your browser.
 
 ## 🎮 Simulations
 

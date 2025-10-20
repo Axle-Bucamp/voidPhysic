@@ -1,6 +1,6 @@
 # 🚀 Getting Started
 
-Welcome to the Void Physics Life Simulation! This guide will help you get up and running quickly.
+Welcome to the Void Physics Life Simulation with Quantum Mechanics Integration! This guide will help you get up and running quickly with both classical void physics and quantum mechanics features.
 
 ## Quick Start
 
@@ -20,18 +20,69 @@ pip install -r requirements.txt
 
 ### 2. Run Your First Simulation
 
+#### Classical Void Physics
 ```bash
 # Navigate to examples directory
 cd examples
 
-# Run the simulation
+# Run the classical simulation
 uv run python void_physics_life_game.py
 
 # Or with regular Python
 python void_physics_life_game.py
 ```
 
+#### Quantum Mechanics Dashboard
+```bash
+# Run the quantum dashboard
+uv run python -m void_physic.visualization.quantum_dashboard
+
+# Or with regular Python
+python -m void_physic.visualization.quantum_dashboard
+```
+
+#### Quantum Examples
+```bash
+# Run quantum examples
+cd examples/quantum_examples
+
+# Schrödinger equation tunneling
+python schrodinger_tunneling.py
+
+# Wave packet evolution
+python wave_packet_evolution.py
+
+# Quantum void emergence
+python quantum_void_emergence.py
+
+# Universe game tutorial
+python universe_game_tutorial.py
+```
+
 ### 3. Choose Your Experience
+
+#### Quantum Dashboard Modes
+
+When you run the quantum dashboard, you'll have access to three modes:
+
+1. **Sandbox Mode** (Recommended for learning)
+   - Interactive parameter sliders (mass, ℏ, potential depth, etc.)
+   - Real-time quantum equation visualization
+   - Compare Schrödinger, Klein-Gordon, and Dirac equations
+   - Perfect for understanding quantum mechanics concepts
+
+2. **Game Mode** (Fun and educational)
+   - Create universes by tuning quantum parameters
+   - Score points for stability and complexity
+   - Save successful universe configurations
+   - Challenge levels with increasing difficulty
+
+3. **Theory Mode**
+   - Deep dive into quantum equations and derivations
+   - Mathematical explanations and visualizations
+   - Connection between quantum mechanics and void physics
+
+#### Classical Void Physics Modes
 
 When prompted, select your preferred visualization mode:
 
@@ -50,6 +101,95 @@ When prompted, select your preferred visualization mode:
    - Run without visualization
    - Save results to files
    - Best for long simulations and analysis
+
+## Quantum Mechanics Tutorials
+
+### Tutorial 1: Your First Quantum Simulation
+
+Let's start with a simple Schrödinger equation simulation:
+
+```python
+from void_physic.quantum.schrodinger import SchrodingerSolver, SchrodingerParameters
+
+# Set up parameters
+params = SchrodingerParameters(
+    mass=1.0,
+    hbar=1.0,
+    dt=0.01,
+    x_min=-5.0,
+    x_max=5.0,
+    n_points=256
+)
+
+# Create a simple harmonic potential
+params.potential = lambda x: 0.5 * x**2
+
+# Initialize solver
+solver = SchrodingerSolver(params)
+
+# Create initial wave packet
+psi_init = solver.create_gaussian_packet(x0=0.0, p0=1.0, sigma=1.0)
+
+# Evolve and visualize
+psi_trajectory, time_array = solver.evolve_trajectory(psi_init, 100)
+```
+
+### Tutorial 2: Playing the Quantum Universe Game
+
+1. **Start the Dashboard**: Run `python -m void_physic.visualization.quantum_dashboard`
+2. **Switch to Game Mode**: Click the "Game" tab
+3. **Adjust Parameters**:
+   - Emergence Rate: Controls how often particles appear
+   - Quantum Coupling: Affects field interactions
+   - Void Strength: Determines particle creation amplitude
+4. **Click "Start Universe"**: Watch your universe evolve!
+5. **Score Points**: Higher scores for more particles, stability, and entropy
+6. **Save Success**: Click "Save Universe" to preserve good configurations
+
+### Tutorial 3: Quantum Tunneling
+
+Explore quantum tunneling through potential barriers:
+
+```python
+# Create a potential barrier
+def barrier_potential(x):
+    return np.where(np.abs(x) < 1.0, 2.0, 0.0)
+
+params.potential = barrier_potential
+
+# Create wave packet with energy below barrier
+psi_init = solver.create_gaussian_packet(x0=-2.0, p0=0.5, sigma=0.5)
+
+# Watch it tunnel through!
+```
+
+### Tutorial 4: Quantum Field Theory
+
+See particles emerge from quantum fields:
+
+```python
+from void_physic.quantum.field_theory import QuantumField, FieldParameters
+
+# Set up quantum field
+field_params = FieldParameters(
+    mass=1.0, hbar=1.0, c=1.0, coupling=0.5,
+    x_min=-5.0, x_max=5.0, n_points=128, dt=0.02
+)
+
+quantum_field = QuantumField(field_params)
+
+# Start from vacuum
+quantum_field.set_field(quantum_field.field_operator.vacuum_state())
+
+# Add particle creation events
+for i in range(50):
+    if np.random.random() < 0.1:  # 10% chance
+        k = np.random.uniform(-2.0, 2.0)
+        amplitude = np.random.uniform(0.5, 1.0)
+        quantum_field.field_operator.create_particle(k, amplitude)
+    
+    quantum_field.evolve_step()
+```
 
 ## Understanding the Simulation
 

@@ -37,6 +37,12 @@ from void_physic.core.lagrangian import EffectiveAction, FieldEquations
 from void_physic.core.potential import DoubleWellPotential, MexicanHatPotential
 from void_physic.core.stochastic import LangevinDynamics, WhiteNoise
 
+# Quantum mechanics modules
+from void_physic.quantum.schrodinger import SchrodingerSolver, WaveFunction, ProbabilityCurrent
+from void_physic.quantum.relativistic import KleinGordonSolver, DiracSolver
+from void_physic.quantum.field_theory import QuantumField, FieldOperator, ParticleCreation
+from void_physic.quantum.operators import Hamiltonian, MomentumOperator, EnergyOperator
+
 # Numerical simulation modules
 from void_physic.simulation.langevin_solver import LangevinSolver
 from void_physic.simulation.statistics import EntropyCalculator, FirstPassageTime
@@ -55,6 +61,18 @@ __all__ = [
     "WhiteNoise",
     "InstantonSolver",
     "TunnelingProbability",
+    # Quantum mechanics
+    "SchrodingerSolver",
+    "WaveFunction",
+    "ProbabilityCurrent",
+    "KleinGordonSolver",
+    "DiracSolver",
+    "QuantumField",
+    "FieldOperator",
+    "ParticleCreation",
+    "Hamiltonian",
+    "MomentumOperator",
+    "EnergyOperator",
     # Simulation
     "LangevinSolver",
     "FirstPassageTime",

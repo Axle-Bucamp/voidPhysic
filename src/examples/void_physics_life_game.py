@@ -34,6 +34,16 @@ from typing import List, Dict, Tuple, Optional, Any
 import warnings
 warnings.filterwarnings('ignore')
 
+# Quantum mechanics imports
+try:
+    from void_physic.quantum.schrodinger import SchrodingerSolver, SchrodingerParameters, WaveFunction
+    from void_physic.quantum.field_theory import QuantumField, FieldParameters
+    from void_physic.core.stochastic import WhiteNoise
+    QUANTUM_AVAILABLE = True
+except ImportError:
+    QUANTUM_AVAILABLE = False
+    print("Warning: Quantum modules not available. Quantum mode disabled.")
+
 try:
     import plotly.graph_objects as go
     import plotly.express as px
@@ -67,6 +77,12 @@ class UniverseConfig:
         self.emergence_rate = 0.1
         self.initial_particle_energy = 1.0
         
+        # Quantum mode parameters
+        self.quantum_mode = False
+        self.quantum_coupling = 1.0
+        self.quantum_uncertainty = 0.1
+        self.wave_function_threshold = 0.1
+        
         # Force constants (Lennard-Jones potential)
         self.force_constants = {
             'epsilon': 1.0,  # Depth of potential well
@@ -96,7 +112,7 @@ class Particle:
     """A fundamental particle that emerges from the void."""
     
     def __init__(self, position: np.ndarray, energy: float = 1.0, 
-                 mass: float = 1.0, charge: float = 0.0):
+                 mass: float = 1.0, charge: float = 0.0, quantum_mode: bool = False):
         self.position = np.array(position, dtype=float)  # 3D position
         self.velocity = np.zeros(3, dtype=float)
         self.energy = energy
@@ -105,6 +121,12 @@ class Particle:
         self.age = 0
         self.void_interference = 0.0
         self.force = np.zeros(3, dtype=float)
+        
+        # Quantum properties
+        self.quantum_mode = quantum_mode
+        self.wave_function = None  # Will be set if quantum_mode is True
+        self.probability_density = 1.0
+        self.quantum_uncertainty = 0.1
         
     def update_position(self, dt: float):
         """Update position using velocity."""
@@ -994,6 +1016,14 @@ class Universe:
         self.stability_analyzer = StabilityAnalyzer(config)
         self.archive = UniverseArchive()
         
+        # Quantum mechanics components
+        self.quantum_field = None
+        self.quantum_noise = None
+        self.schrodinger_solver = None
+        
+        if config.quantum_mode and QUANTUM_AVAILABLE:
+            self._initialize_quantum_components()
+        
         # History tracking
         self.history = []
         
@@ -1018,8 +1048,55 @@ class Universe:
         
         return sum(p.position * p.mass for p in self.particles) / total_mass
     
+    def _initialize_quantum_components(self):
+        """Initialize quantum mechanics components."""
+        if not QUANTUM_AVAILABLE:
+            return
+        
+        # Initialize quantum field
+        field_params = FieldParameters(
+            mass=1.0,
+            hbar=1.0,
+            c=1.0,
+            coupling=self.config.quantum_coupling,
+            x_min=-10.0,
+            x_max=10.0,
+            n_points=256,
+            dt=0.01
+        )
+        self.quantum_field = QuantumField(field_params)
+        
+        # Initialize quantum noise
+        self.quantum_noise = WhiteNoise(
+            strength=1.0, 
+            quantum_mode=True, 
+            hbar=1.0
+        )
+        
+        # Initialize Schrödinger solver
+        schrodinger_params = SchrodingerParameters(
+            mass=1.0,
+            hbar=1.0,
+            dt=0.01,
+            x_min=-10.0,
+            x_max=10.0,
+            n_points=256
+        )
+        self.schrodinger_solver = SchrodingerSolver(schrodinger_params)
+    
     def add_particle(self, particle: Particle) -> None:
         """Add particle to universe."""
+        # Set quantum mode if universe is in quantum mode
+        if self.config.quantum_mode:
+            particle.quantum_mode = True
+            # Initialize wave function for particle
+            if self.schrodinger_solver is not None:
+                particle.wave_function = self.schrodinger_solver.create_gaussian_packet(
+                    x0=particle.position[0], 
+                    p0=particle.velocity[0], 
+                    sigma=particle.quantum_uncertainty
+                )
+        
         self.particles.append(particle)
     
     def create_atom(self, particles: List[Particle]) -> Atom:
@@ -1095,6 +1172,43 @@ class Universe:
             self.entropy_tracker.update_expansion_rate(entropy_rate)
             self.entropy_tracker.expand_universe(self)
     
+    def _update_quantum_evolution(self, dt: float) -> None:
+        """Update quantum mechanics evolution."""
+        if not QUANTUM_AVAILABLE or self.quantum_field is None:
+            return
+        
+        # Evolve quantum field
+        self.quantum_field.evolve_step()
+        
+        # Update particle wave functions
+        for particle in self.particles:
+            if particle.quantum_mode and particle.wave_function is not None:
+                # Evolve wave function
+                particle.wave_function = self.schrodinger_solver.evolve_step(particle.wave_function)
+                
+                # Update particle position based on wave function
+                particle.probability_density = np.max(particle.wave_function.probability_density)
+                
+                # Check for quantum tunneling/emergence
+                if particle.probability_density > self.config.wave_function_threshold:
+                    # Particle has high probability - can interact with other particles
+                    particle.void_interference = particle.probability_density
+        
+        # Quantum vacuum fluctuations
+        if self.quantum_noise is not None:
+            for particle in self.particles:
+                if particle.quantum_mode and particle.wave_function is not None:
+                    # Add quantum vacuum fluctuation
+                    vacuum_fluctuation = self.quantum_noise.quantum_vacuum_fluctuation(
+                        particle.wave_function.psi, 
+                        self.schrodinger_solver.x_grid, 
+                        particle.mass
+                    )
+                    
+                    # Add fluctuation to wave function
+                    particle.wave_function.psi += vacuum_fluctuation * self.config.quantum_uncertainty
+                    particle.wave_function.normalize()
+    
     def update(self, dt: float = None) -> None:
         """Update universe state."""
         if dt is None:
@@ -1110,18 +1224,22 @@ class Universe:
             # Create atom from new particle
             atom = self.create_atom([particle])
         
-        # 2. Physics update
+        # 2. Quantum evolution (if enabled)
+        if self.config.quantum_mode and QUANTUM_AVAILABLE:
+            self._update_quantum_evolution(dt)
+        
+        # 3. Physics update
         if self.particles:
             self.physics_engine.update_particles(self.particles, dt)
         
-        # 3. Bonding
+        # 4. Bonding
         self.check_bond_formation()
         self.check_bond_breaking()
         
-        # 4. Energy transmission
+        # 5. Energy transmission
         self.transmit_energy_through_bonds()
         
-        # 5. Entropy & expansion
+        # 6. Entropy & expansion
         self.update_entropy()
         
         # 6. Stability analysis
